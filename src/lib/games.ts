@@ -1,0 +1,76 @@
+import { Conference, LeagueType, Sport } from "@/generated/prisma/client";
+import { prisma } from "@/lib/prisma";
+import { LEAGUE_TYPE_TO_CONFERENCE } from "@/lib/constants";
+
+export function sportForLeague(leagueType: LeagueType): Sport {
+  return leagueType === LeagueType.NFL ? Sport.NFL : Sport.COLLEGE_FOOTBALL;
+}
+
+export async function getLeagueGames(leagueType: LeagueType, season: number, week: number) {
+  const sport = sportForLeague(leagueType);
+  const targetConference = LEAGUE_TYPE_TO_CONFERENCE[leagueType];
+
+  const games = await prisma.game.findMany({
+    where: { sport, season, week },
+    include: { awayTeam: true, homeTeam: true },
+    orderBy: { kickoff: "asc" },
+  });
+
+  if (leagueType === LeagueType.NFL) {
+    return games;
+  }
+
+  return games.filter(
+    (g) =>
+      g.awayTeam.conference === targetConference ||
+      g.homeTeam.conference === targetConference
+  );
+}
+
+export function gameInvolvesConference(
+  awayConf: Conference,
+  homeConf: Conference,
+  target: Conference
+) {
+  return awayConf === target || homeConf === target;
+}
+
+export async function getFirstKickoff(leagueType: LeagueType, season: number, week: number) {
+  const games = await getLeagueGames(leagueType, season, week);
+  if (games.length === 0) return null;
+  return games[0].kickoff;
+}
+
+export async function ensurePickDeadline(leagueId: string, leagueType: LeagueType, season: number, week: number) {
+  const existing = await prisma.pickDeadline.findUnique({
+    where: { leagueId_week_season: { leagueId, week, season } },
+  });
+  if (existing) return existing.deadline;
+
+  const firstKickoff = await getFirstKickoff(leagueType, season, week);
+  if (!firstKickoff) return null;
+
+  const deadline = await prisma.pickDeadline.upsert({
+    where: { leagueId_week_season: { leagueId, week, season } },
+    create: { leagueId, week, season, deadline: firstKickoff },
+    update: { deadline: firstKickoff },
+  });
+
+  return deadline.deadline;
+}
+
+export async function canMakePicks(leagueId: string, leagueType: LeagueType, season: number, week: number) {
+  const deadline = await ensurePickDeadline(leagueId, leagueType, season, week);
+  if (!deadline) return true;
+  return new Date() < deadline;
+}
+
+export function getCurrentWeekFromGames(games: { week: number; kickoff: Date }[]) {
+  if (games.length === 0) return 1;
+  const now = new Date();
+  const upcoming = games.filter((g) => g.kickoff >= now);
+  if (upcoming.length > 0) {
+    return Math.min(...upcoming.map((g) => g.week));
+  }
+  return Math.max(...games.map((g) => g.week));
+}

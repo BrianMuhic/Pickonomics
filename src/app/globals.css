@@ -1,0 +1,258 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0f172a;
+  --card: #111827;
+  --muted: #94a3b8;
+  --pri: #22c55e;
+  --red: #ef4444;
+  --link: #93c5fd;
+  --border: #1f2937;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: #e5e7eb;
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+}
+
+a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #374151;
+  background: #1f2937;
+  color: #e5e7eb;
+  cursor: pointer;
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: #374151;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--pri);
+  border-color: #16a34a;
+  color: #08180d;
+  font-weight: 700;
+}
+
+.btn-primary:hover {
+  background: #16a34a;
+}
+
+.btn-danger {
+  background: var(--red);
+  border-color: #b91c1c;
+  color: white;
+}
+
+.btn-admin {
+  background: #7c3aed;
+  border-color: #6d28d9;
+  color: white;
+}
+
+.pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #0b1220;
+  border: 1px solid #374151;
+  font-size: 0.9rem;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.text-link {
+  color: var(--link);
+}
+
+label.field-label {
+  display: block;
+  margin: 10px 0 6px;
+  font-size: 0.9rem;
+}
+
+input.field-input,
+select.field-input,
+textarea.field-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #374151;
+  background: #0b1220;
+  color: #e5e7eb;
+}
+
+.password-input-wrap {
+  position: relative;
+}
+
+.password-input-wrap .field-input {
+  padding-right: 4.5rem;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  padding: 4px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--link);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.password-toggle:hover {
+  background: #1f2937;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.data-table tbody tr {
+  background: #0b1220;
+}
+
+.data-table tbody tr td:first-child {
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+.data-table tbody tr td:last-child {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.alert {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.alert-error {
+  background: #fecaca;
+  border: 1px solid #f87171;
+  color: #7f1d1d;
+}
+
+.alert-success {
+  background: #d1fae5;
+  border: 1px solid #10b981;
+  color: #064e3b;
+}
+
+.alert-warning {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  color: #78350f;
+}
+
+.week-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #374151;
+  background: #1f2937;
+  color: #e5e7eb;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.week-btn:hover {
+  background: #374151;
+  text-decoration: none;
+}
+
+.week-btn-active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.game-row {
+  padding: 12px;
+  border-radius: 12px;
+  background: #0b1220;
+  border: 1px solid #1f2937;
+}
+
+.pick-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #374151;
+  cursor: pointer;
+}
+
+.pick-option input {
+  width: auto;
+}
+
+.pick-selected {
+  border-color: var(--pri);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.league-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.grid-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
