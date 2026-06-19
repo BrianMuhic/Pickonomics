@@ -9,6 +9,7 @@ import {
   getLeagueContext,
   getSeasonLeaderboard,
   getWeeklyLeaderboard,
+  leaguePathWithWeek,
 } from "@/lib/league-data";
 
 export default async function LeaderboardPage({
@@ -28,6 +29,8 @@ export default async function LeaderboardPage({
     user,
     weekParam
   );
+
+  if (!weekParam) redirect(leaguePathWithWeek(id, week, "leaderboard"));
 
   if (!isMember) redirect(`/leagues/${id}/join`);
 

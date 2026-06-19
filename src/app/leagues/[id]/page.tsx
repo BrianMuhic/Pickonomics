@@ -7,7 +7,7 @@ import { WeekSelector } from "@/components/WeekSelector";
 import { getCurrentUser } from "@/lib/auth";
 import { LEAGUE_TYPE_LABELS } from "@/lib/constants";
 import { formatGameDateTime } from "@/lib/datetime";
-import { getLeagueContext, getUserPicksForWeek } from "@/lib/league-data";
+import { getLeagueContext, getUserPicksForWeek, leaguePathWithWeek } from "@/lib/league-data";
 
 export default async function LeaguePicksPage({
   params,
@@ -23,6 +23,8 @@ export default async function LeaguePicksPage({
   const { week: weekParam } = await searchParams;
   const { league, isMember, isCommissioner, week, games, deadline, picksOpen } =
     await getLeagueContext(id, user, weekParam);
+
+  if (!weekParam) redirect(leaguePathWithWeek(id, week));
 
   if (!isMember) {
     return (

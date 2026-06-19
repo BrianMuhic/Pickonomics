@@ -4,7 +4,7 @@ import { LeagueNav } from "@/components/LeagueNav";
 import { WeekSelector } from "@/components/WeekSelector";
 import { getCurrentUser } from "@/lib/auth";
 import { formatGameDateTime } from "@/lib/datetime";
-import { getLeagueContext } from "@/lib/league-data";
+import { getLeagueContext, leaguePathWithWeek } from "@/lib/league-data";
 
 export default async function GamesPage({
   params,
@@ -23,6 +23,8 @@ export default async function GamesPage({
     user,
     weekParam
   );
+
+  if (!weekParam) redirect(leaguePathWithWeek(id, week, "games"));
 
   if (!isMember) redirect(`/leagues/${id}/join`);
 

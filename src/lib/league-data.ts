@@ -2,7 +2,14 @@ import { LeagueType } from "@/generated/prisma/client";
 import { notFound, redirect } from "next/navigation";
 import { currentSeasonYear, maxWeeksForLeague } from "@/lib/constants";
 import { syncGamesForLeagueType } from "@/lib/espn/sync";
-import { canMakePicks, ensurePickDeadline, getLeagueGames, sportForLeague } from "@/lib/games";
+import {
+  canMakePicks,
+  ensurePickDeadline,
+  getCurrentWeekFromGames,
+  getLeagueGames,
+  getSeasonGamesForLeague,
+  sportForLeague,
+} from "@/lib/games";
 import { prisma } from "@/lib/prisma";
 import {
   computeSeasonStandings,
@@ -60,8 +67,14 @@ export async function getLeagueContext(leagueId: string, user: SessionUser | nul
   const season = await ensureLeagueSeason(league);
 
   const maxWeeks = maxWeeksForLeague(league.leagueType);
-  let week = weekParam ? parseInt(weekParam, 10) : 1;
-  if (isNaN(week) || week < 1) week = 1;
+  let week: number;
+  if (weekParam) {
+    week = parseInt(weekParam, 10);
+    if (isNaN(week) || week < 1) week = 1;
+  } else {
+    const seasonGames = await getSeasonGamesForLeague(league.leagueType, season);
+    week = getCurrentWeekFromGames(seasonGames);
+  }
   if (week > maxWeeks) week = maxWeeks;
 
   const games = await getLeagueGames(league.leagueType, season, week);
@@ -69,6 +82,11 @@ export async function getLeagueContext(leagueId: string, user: SessionUser | nul
   const picksOpen = await canMakePicks(leagueId, league.leagueType, season, week);
 
   return { league, isMember, isCommissioner, week, games, deadline, picksOpen };
+}
+
+export function leaguePathWithWeek(leagueId: string, week: number, subpath?: string) {
+  const base = subpath ? `/leagues/${leagueId}/${subpath}` : `/leagues/${leagueId}`;
+  return `${base}?week=${week}`;
 }
 
 export async function getUserPicksForWeek(

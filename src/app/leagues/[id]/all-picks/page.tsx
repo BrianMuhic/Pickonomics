@@ -3,7 +3,7 @@ import { LeagueNav } from "@/components/LeagueNav";
 import { LeagueToolbar } from "@/components/LeagueToolbar";
 import { WeekSelector } from "@/components/WeekSelector";
 import { getCurrentUser } from "@/lib/auth";
-import { getAllPicksForLeague, getLeagueContext } from "@/lib/league-data";
+import { getAllPicksForLeague, getLeagueContext, leaguePathWithWeek } from "@/lib/league-data";
 
 export default async function AllPicksPage({
   params,
@@ -22,6 +22,8 @@ export default async function AllPicksPage({
     user,
     weekParam
   );
+
+  if (!weekParam) redirect(leaguePathWithWeek(id, week, "all-picks"));
 
   if (!isMember) redirect(`/leagues/${id}/join`);
 

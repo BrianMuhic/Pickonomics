@@ -8,6 +8,32 @@ export function sportForLeague(leagueType: LeagueType): Sport {
   return Sport.COLLEGE_FOOTBALL;
 }
 
+export async function getSeasonGamesForLeague(leagueType: LeagueType, season: number) {
+  const sport = sportForLeague(leagueType);
+  const targetConference = LEAGUE_TYPE_TO_CONFERENCE[leagueType];
+
+  const games = await prisma.game.findMany({
+    where: { sport, season },
+    select: {
+      week: true,
+      kickoff: true,
+      awayTeam: { select: { conference: true } },
+      homeTeam: { select: { conference: true } },
+    },
+    orderBy: { kickoff: "asc" },
+  });
+
+  if (leagueType === LeagueType.NFL || leagueType === LeagueType.MLB) {
+    return games;
+  }
+
+  return games.filter(
+    (g) =>
+      g.awayTeam.conference === targetConference ||
+      g.homeTeam.conference === targetConference
+  );
+}
+
 export async function getLeagueGames(leagueType: LeagueType, season: number, week: number) {
   const sport = sportForLeague(leagueType);
   const targetConference = LEAGUE_TYPE_TO_CONFERENCE[leagueType];
