@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { Nav } from "@/components/Nav";
 import { getCurrentUser } from "@/lib/auth";
 import "./globals.css";
@@ -28,6 +29,7 @@ export default async function RootLayout({
           <Nav user={user} />
           {children}
         </div>
+        <Analytics />
       </body>
     </html>
   );
