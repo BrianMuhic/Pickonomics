@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { createLeagueAction } from "@/actions/leagues";
 import { Alert } from "@/components/Alert";
 import { PasswordInput } from "@/components/PasswordInput";
@@ -9,6 +9,7 @@ import { LEAGUE_TYPES } from "@/lib/types";
 
 export function CreateLeagueForm() {
   const [state, formAction, pending] = useActionState(createLeagueAction, {});
+  const [isPublic, setIsPublic] = useState(true);
 
   return (
     <form action={formAction} className="space-y-4">
@@ -28,13 +29,21 @@ export function CreateLeagueForm() {
         </select>
       </div>
       <div className="flex items-center gap-2">
-        <input type="checkbox" name="isPublic" id="isPublic" defaultChecked />
+        <input
+          type="checkbox"
+          name="isPublic"
+          id="isPublic"
+          checked={isPublic}
+          onChange={(e) => setIsPublic(e.target.checked)}
+        />
         <label htmlFor="isPublic">Public league (anyone can join)</label>
       </div>
-      <div>
-        <label className="field-label">Password (required if private)</label>
-        <PasswordInput name="password" minLength={4} />
-      </div>
+      {!isPublic && (
+        <div>
+          <label className="field-label">League password</label>
+          <PasswordInput name="password" required minLength={4} />
+        </div>
+      )}
       <button type="submit" className="btn btn-primary" disabled={pending}>
         {pending ? "Creating..." : "Create League"}
       </button>
