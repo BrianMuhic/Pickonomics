@@ -4,10 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { LeagueType, PickLockOverride } from "@/generated/prisma/client";
 import { requireUser, hashPassword, verifyPassword } from "@/lib/auth";
-import { currentSeasonYear } from "@/lib/constants";
+import { currentSeasonYear, maxWeeksForLeague } from "@/lib/constants";
 import { canMakePicks, ensurePickDeadline } from "@/lib/games";
 import { prisma } from "@/lib/prisma";
-import { syncGamesForLeagueType } from "@/lib/espn/sync";
+import { syncGamesForLeagueType, syncGamesForLeagueTypeWeek } from "@/lib/espn/sync";
 import { changeLeaguePasswordSchema, createLeagueSchema } from "@/lib/validations";
 import type { ActionResult } from "./auth";
 
@@ -93,7 +93,7 @@ export async function joinLeagueAction(
   redirect(`/leagues/${league.id}`);
 }
 
-export async function fetchScoresAction(leagueId: string): Promise<ActionResult> {
+export async function fetchScoresAction(leagueId: string, week: number): Promise<ActionResult> {
   const user = await requireUser();
 
   const membership = await prisma.leagueMember.findUnique({
@@ -104,13 +104,17 @@ export async function fetchScoresAction(leagueId: string): Promise<ActionResult>
   const league = await prisma.league.findUnique({ where: { id: leagueId } });
   if (!league) return { error: "League not found" };
 
+  if (!Number.isInteger(week) || week < 1) return { error: "Invalid week" };
+  const maxWeeks = maxWeeksForLeague(league.leagueType);
+  if (week > maxWeeks) return { error: "Invalid week" };
+
   const season = currentSeasonYear();
   if (league.season !== season) {
     await prisma.league.update({ where: { id: leagueId }, data: { season } });
   }
 
   try {
-    await syncGamesForLeagueType(league.leagueType, season);
+    await syncGamesForLeagueTypeWeek(league.leagueType, season, week);
     revalidatePath(`/leagues/${leagueId}`);
     revalidatePath(`/leagues/${leagueId}/leaderboard`);
     return { success: "Scores updated successfully" };

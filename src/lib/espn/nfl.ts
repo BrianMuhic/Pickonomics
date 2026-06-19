@@ -92,6 +92,24 @@ export async function fetchNflSeasonGames(season: number): Promise<EspnGameData[
 }
 
 export async function fetchNflWeekGames(week: number, season: number): Promise<EspnGameData[]> {
-  const all = await fetchNflSeasonGames(season);
-  return all.filter((g) => g.week === week);
+  const url = `https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?limit=1000&dates=${season}&seasontype=${NFL_REGULAR_SEASON_TYPE}&week=${week}`;
+
+  const response = await fetch(url, { next: { revalidate: 0 } });
+  if (!response.ok) {
+    throw new Error(`ESPN NFL API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  const games: EspnGameData[] = [];
+
+  for (const event of data.events || []) {
+    const parsed = parseEspnEvent(event);
+    if (parsed) {
+      parsed.away.conference = mapEspnConference("NFL");
+      parsed.home.conference = mapEspnConference("NFL");
+      games.push(parsed);
+    }
+  }
+
+  return games;
 }

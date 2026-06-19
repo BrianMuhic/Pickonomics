@@ -36,6 +36,7 @@ export default async function AllPicksPage({
           <h1 className="text-2xl font-bold">All Picks — Week {week}</h1>
           <LeagueToolbar
             leagueId={id}
+            week={week}
             isCommissioner={isCommissioner}
             isPrivate={!league.isPublic}
           />

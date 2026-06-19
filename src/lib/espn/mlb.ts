@@ -170,7 +170,31 @@ export async function fetchMlbSeasonGames(season: number): Promise<EspnGameData[
   return assignWeeks([...byEspnId.values()]);
 }
 
-export async function fetchMlbWeekGames(week: number, season: number): Promise<EspnGameData[]> {
-  const all = await fetchMlbSeasonGames(season);
-  return all.filter((g) => g.week === week);
+function formatYmd(year: number, month: number, day: number): string {
+  return `${year}${String(month).padStart(2, "0")}${String(day).padStart(2, "0")}`;
+}
+
+function msToYmd(ms: number): string {
+  const date = new Date(ms);
+  return formatYmd(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
+}
+
+export function seasonStartMondayMsFromKickoff(kickoff: Date): number {
+  const cal = getEasternCalendarDate(kickoff);
+  return mondayOfWeekMs(cal.year, cal.month, cal.day, cal.weekday);
+}
+
+export async function fetchMlbWeekGames(
+  week: number,
+  seasonStartMondayMs: number
+): Promise<EspnGameData[]> {
+  const startMs = seasonStartMondayMs + (week - 1) * 7 * 24 * 60 * 60 * 1000;
+  const endMs = startMs + 6 * 24 * 60 * 60 * 1000;
+  const games = await fetchMlbGamesForDateRange(msToYmd(startMs), msToYmd(endMs));
+
+  for (const game of games) {
+    game.week = week;
+  }
+
+  return games;
 }

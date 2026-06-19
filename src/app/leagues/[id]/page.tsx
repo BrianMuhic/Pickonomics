@@ -61,6 +61,7 @@ export default async function LeaguePicksPage({
           </div>
           <LeagueToolbar
             leagueId={id}
+            week={week}
             isCommissioner={isCommissioner}
             isPrivate={!league.isPublic}
           />

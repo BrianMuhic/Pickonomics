@@ -47,6 +47,7 @@ export default async function LeaderboardPage({
           </div>
           <LeagueToolbar
             leagueId={id}
+            week={week}
             isCommissioner={isCommissioner}
             isPrivate={!league.isPublic}
           />

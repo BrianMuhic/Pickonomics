@@ -76,8 +76,16 @@ async function fetchCollegeScoreboard(params: string): Promise<EspnGameData[]> {
   return games;
 }
 
+const COLLEGE_REGULAR_SEASON_TYPE = 2;
+
 export async function fetchCollegeSeasonGames(season: number): Promise<EspnGameData[]> {
   const startDate = `${season}0801`;
   const endDate = `${season + 1}0115`;
   return fetchCollegeScoreboard(`limit=1000&dates=${startDate}-${endDate}`);
+}
+
+export async function fetchCollegeWeekGames(week: number, season: number): Promise<EspnGameData[]> {
+  return fetchCollegeScoreboard(
+    `limit=1000&dates=${season}&seasontype=${COLLEGE_REGULAR_SEASON_TYPE}&week=${week}`
+  );
 }

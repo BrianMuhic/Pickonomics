@@ -1,8 +1,12 @@
 import { Conference, LeagueType, Sport } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
-import { fetchNflSeasonGames } from "./nfl";
-import { fetchMlbSeasonGames } from "./mlb";
-import { fetchCollegeSeasonGames } from "./college";
+import { fetchNflSeasonGames, fetchNflWeekGames } from "./nfl";
+import {
+  fetchMlbSeasonGames,
+  fetchMlbWeekGames,
+  seasonStartMondayMsFromKickoff,
+} from "./mlb";
+import { fetchCollegeSeasonGames, fetchCollegeWeekGames } from "./college";
 import { mapEspnConferenceId } from "./conferences";
 import { EspnGameData } from "./types";
 
@@ -62,6 +66,17 @@ async function upsertGame(game: EspnGameData, sport: Sport) {
   });
 }
 
+async function upsertGames(games: EspnGameData[], sport: Sport, season: number) {
+  for (const game of games) {
+    await upsertGame(game, sport);
+    await prisma.game.update({
+      where: { espnGameId_sport: { espnGameId: game.espnGameId, sport } },
+      data: { season },
+    });
+  }
+  return games.length;
+}
+
 export async function syncNflGames(season: number) {
   const games = await fetchNflSeasonGames(season);
   const syncedEspnIds = new Set<string>();
@@ -86,6 +101,11 @@ export async function syncNflGames(season: number) {
   }
 
   return games.length;
+}
+
+export async function syncNflGamesForWeek(season: number, week: number) {
+  const games = await fetchNflWeekGames(week, season);
+  return upsertGames(games, Sport.NFL, season);
 }
 
 export async function syncMlbGames(season: number) {
@@ -114,20 +134,34 @@ export async function syncMlbGames(season: number) {
   return games.length;
 }
 
+async function getMlbSeasonStartMondayMs(season: number): Promise<number | null> {
+  const earliest = await prisma.game.findFirst({
+    where: { sport: Sport.MLB, season },
+    orderBy: { kickoff: "asc" },
+    select: { kickoff: true },
+  });
+  if (!earliest) return null;
+  return seasonStartMondayMsFromKickoff(earliest.kickoff);
+}
+
+export async function syncMlbGamesForWeek(season: number, week: number) {
+  const seasonStartMondayMs = await getMlbSeasonStartMondayMs(season);
+  if (seasonStartMondayMs == null) {
+    return syncMlbGames(season);
+  }
+
+  const games = await fetchMlbWeekGames(week, seasonStartMondayMs);
+  return upsertGames(games, Sport.MLB, season);
+}
+
 export async function syncCollegeGames(season: number) {
   const games = await fetchCollegeSeasonGames(season);
-  let count = 0;
-  for (const game of games) {
-    await upsertGame(game, Sport.COLLEGE_FOOTBALL);
-    await prisma.game.update({
-      where: {
-        espnGameId_sport: { espnGameId: game.espnGameId, sport: Sport.COLLEGE_FOOTBALL },
-      },
-      data: { season },
-    });
-    count++;
-  }
-  return count;
+  return upsertGames(games, Sport.COLLEGE_FOOTBALL, season);
+}
+
+export async function syncCollegeGamesForWeek(season: number, week: number) {
+  const games = await fetchCollegeWeekGames(week, season);
+  return upsertGames(games, Sport.COLLEGE_FOOTBALL, season);
 }
 
 export async function syncGamesForLeagueType(leagueType: LeagueType, season: number) {
@@ -138,6 +172,20 @@ export async function syncGamesForLeagueType(leagueType: LeagueType, season: num
     return syncMlbGames(season);
   }
   return syncCollegeGames(season);
+}
+
+export async function syncGamesForLeagueTypeWeek(
+  leagueType: LeagueType,
+  season: number,
+  week: number
+) {
+  if (leagueType === LeagueType.NFL) {
+    return syncNflGamesForWeek(season, week);
+  }
+  if (leagueType === LeagueType.MLB) {
+    return syncMlbGamesForWeek(season, week);
+  }
+  return syncCollegeGamesForWeek(season, week);
 }
 
 export async function updateGameScores(leagueType: LeagueType, season: number) {
