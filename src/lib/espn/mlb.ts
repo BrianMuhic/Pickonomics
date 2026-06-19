@@ -1,5 +1,40 @@
+import { GAME_TIMEZONE } from "@/lib/datetime";
 import { EspnGameData } from "./types";
 import { mapEspnConference } from "./conferences";
+
+const WEEKDAY_MAP: Record<string, number> = {
+  Sun: 0,
+  Mon: 1,
+  Tue: 2,
+  Wed: 3,
+  Thu: 4,
+  Fri: 5,
+  Sat: 6,
+};
+
+function getEasternCalendarDate(date: Date) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: GAME_TIMEZONE,
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    weekday: "short",
+  }).formatToParts(date);
+
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  return {
+    year: parseInt(get("year"), 10),
+    month: parseInt(get("month"), 10),
+    day: parseInt(get("day"), 10),
+    weekday: WEEKDAY_MAP[get("weekday")] ?? 0,
+  };
+}
+
+function mondayOfWeekMs(year: number, month: number, day: number, weekday: number) {
+  const monday = new Date(Date.UTC(year, month - 1, day));
+  monday.setUTCDate(monday.getUTCDate() - ((weekday + 6) % 7));
+  return Date.UTC(monday.getUTCFullYear(), monday.getUTCMonth(), monday.getUTCDate());
+}
 
 const MLB_REGULAR_SEASON_TYPE = 2;
 
@@ -71,15 +106,19 @@ function assignWeeks(games: EspnGameData[]): EspnGameData[] {
     (earliest, game) => (game.kickoff < earliest ? game.kickoff : earliest),
     games[0].kickoff
   );
-  const startMs = Date.UTC(
-    seasonStart.getUTCFullYear(),
-    seasonStart.getUTCMonth(),
-    seasonStart.getUTCDate()
+  const startCal = getEasternCalendarDate(seasonStart);
+  const seasonStartMondayMs = mondayOfWeekMs(
+    startCal.year,
+    startCal.month,
+    startCal.day,
+    startCal.weekday
   );
 
   for (const game of games) {
-    const gameMs = Date.UTC(game.kickoff.getUTCFullYear(), game.kickoff.getUTCMonth(), game.kickoff.getUTCDate());
-    game.week = Math.floor((gameMs - startMs) / (7 * 24 * 60 * 60 * 1000)) + 1;
+    const cal = getEasternCalendarDate(game.kickoff);
+    const gameMondayMs = mondayOfWeekMs(cal.year, cal.month, cal.day, cal.weekday);
+    game.week =
+      Math.floor((gameMondayMs - seasonStartMondayMs) / (7 * 24 * 60 * 60 * 1000)) + 1;
   }
 
   return games;
