@@ -90,6 +90,9 @@ export default async function HomePage({
             <Link href="/leagues/new" className="btn btn-primary">
               Create League
             </Link>
+            <Link href="/my-leagues" className="btn">
+              My Leagues
+            </Link>
           </div>
         ) : (
           <p className="mt-4">

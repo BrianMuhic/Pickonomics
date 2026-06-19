@@ -14,6 +14,9 @@ export function Nav({ user }: { user: SessionUser | null }) {
             <Link href="/leagues/new" className="btn">
               Create League
             </Link>
+            <Link href="/my-leagues" className="btn">
+              My Leagues
+            </Link>
             {user.isAdmin && (
               <Link href="/admin" className="btn btn-admin">
                 Admin
