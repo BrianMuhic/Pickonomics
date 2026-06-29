@@ -107,13 +107,26 @@ export async function ensureLeaderboardScoresSynced(
   season: number,
   viewedWeek: number
 ) {
-  const maxWeeks = maxWeeksForLeague(leagueType);
+  const games = await getLeagueGames(leagueType, season, viewedWeek);
+  if (games.length === 0) return;
+
+  try {
+    await syncGamesForLeagueTypeWeek(leagueType, season, viewedWeek);
+  } catch (e) {
+    console.error("Failed to sync scores for week", viewedWeek, e);
+  }
+}
+
+async function syncStaleWeeksForSeason(
+  leagueType: LeagueType,
+  season: number,
+  maxWeeks: number,
+  limit = 3
+) {
   const now = new Date();
-  const weeksToSync = new Set<number>([viewedWeek]);
+  let synced = 0;
 
-  for (let week = 1; week <= maxWeeks; week++) {
-    if (week === viewedWeek) continue;
-
+  for (let week = maxWeeks; week >= 1 && synced < limit; week--) {
     const games = await getLeagueGames(leagueType, season, week);
     if (games.length === 0 || isWeekComplete(games)) continue;
 
@@ -121,14 +134,11 @@ export async function ensureLeaderboardScoresSynced(
       (latest, game) => (game.kickoff > latest ? game.kickoff : latest),
       games[0].kickoff
     );
-    if (latestKickoff < now) {
-      weeksToSync.add(week);
-    }
-  }
+    if (latestKickoff >= now) continue;
 
-  for (const week of weeksToSync) {
     try {
       await syncGamesForLeagueTypeWeek(leagueType, season, week);
+      synced++;
     } catch (e) {
       console.error("Failed to sync scores for week", week, e);
     }
@@ -209,6 +219,8 @@ export async function getSeasonLeaderboard(leagueId: string, season: number) {
   }));
 
   const maxWeeks = maxWeeksForLeague(league.leagueType);
+  await syncStaleWeeksForSeason(league.leagueType, season, maxWeeks);
+
   const weeklyScoresByWeek = new Map<number, ReturnType<typeof computeWeeklyScores>>();
 
   for (let week = 1; week <= maxWeeks; week++) {
