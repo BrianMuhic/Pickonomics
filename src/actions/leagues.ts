@@ -8,6 +8,7 @@ import { currentSeasonYear, maxWeeksForLeague } from "@/lib/constants";
 import { canMakePicks, ensurePickDeadline } from "@/lib/games";
 import { prisma } from "@/lib/prisma";
 import { syncGamesForLeagueType, syncGamesForLeagueTypeWeek } from "@/lib/espn/sync";
+import { finalizeWeeklyResults } from "@/lib/weekly-results";
 import {
   changeLeaguePasswordSchema,
   createLeagueSchema,
@@ -119,6 +120,7 @@ export async function fetchScoresAction(leagueId: string, week: number): Promise
 
   try {
     await syncGamesForLeagueTypeWeek(league.leagueType, season, week);
+    await finalizeWeeklyResults(leagueId, week, season);
     revalidatePath(`/leagues/${leagueId}`);
     revalidatePath(`/leagues/${leagueId}/leaderboard`);
     return { success: "Scores updated successfully" };

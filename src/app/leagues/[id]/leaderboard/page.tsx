@@ -6,7 +6,6 @@ import { WeekSelector } from "@/components/WeekSelector";
 import { getCurrentUser } from "@/lib/auth";
 import { LEAGUE_TYPE_LABELS } from "@/lib/constants";
 import {
-  ensureLeaderboardScoresSynced,
   getLeagueContext,
   getSeasonLeaderboard,
   getWeeklyLeaderboardData,
@@ -34,8 +33,6 @@ export default async function LeaderboardPage({
   if (!weekParam) redirect(leaguePathWithWeek(id, week, "leaderboard"));
 
   if (!isMember) redirect(`/leagues/${id}/join`);
-
-  await ensureLeaderboardScoresSynced(league.leagueType, league.season, week);
 
   const { rows: weeklyRows, weekComplete, winnerUsernames } = await getWeeklyLeaderboardData(
     id,

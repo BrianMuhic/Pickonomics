@@ -50,6 +50,7 @@ model User {
   memberships     LeagueMember[]
   picks           Pick[]
   commissioned    League[]       @relation("Commissioner")
+  weeklyResults   WeeklyResult[]
 }
 
 model League {
@@ -66,6 +67,7 @@ model League {
   members        LeagueMember[]
   picks          Pick[]
   deadlines      PickDeadline[]
+  weeklyResults  WeeklyResult[]
 
   @@index([isPublic])
   @@index([leagueType])
@@ -147,4 +149,22 @@ model PickDeadline {
   league League @relation(fields: [leagueId], references: [id], onDelete: Cascade)
 
   @@unique([leagueId, week, season])
+}
+
+model WeeklyResult {
+  id          String   @id @default(cuid())
+  leagueId    String
+  userId      String
+  week        Int
+  season      Int
+  correct     Int
+  totalPicks  Int
+  wonWeek     Boolean  @default(false)
+  finalizedAt DateTime @default(now())
+
+  league League @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([leagueId, userId, week, season])
+  @@index([leagueId, season])
 }

@@ -1,7 +1,7 @@
 import { LeagueType } from "@/generated/prisma/client";
 import { notFound, redirect } from "next/navigation";
 import { currentSeasonYear, maxWeeksForLeague } from "@/lib/constants";
-import { syncGamesForLeagueType, syncGamesForLeagueTypeWeek } from "@/lib/espn/sync";
+import { syncGamesForLeagueType } from "@/lib/espn/sync";
 import {
   canMakePicks,
   ensurePickDeadline,
@@ -12,14 +12,15 @@ import {
 } from "@/lib/games";
 import { prisma } from "@/lib/prisma";
 import {
-  computeSeasonStandings,
   computeWeeklyScores,
-  getUniquePickedGames,
   getWeeklyWinners,
-  isGameCancelledOrPostponed,
   isWeekCompleteForPickedGames,
 } from "@/lib/scoring";
 import type { SessionUser } from "@/lib/session";
+import {
+  getStoredSeasonLeaderboard,
+  getStoredWeeklyLeaderboard,
+} from "@/lib/weekly-results";
 
 export async function ensureLeagueSeason(league: {
   id: string;
@@ -104,89 +105,10 @@ export async function getUserPicksForWeek(
   return new Map(picks.map((p) => [p.gameId, p.pick]));
 }
 
-export async function ensureLeaderboardScoresSynced(
-  leagueType: LeagueType,
-  season: number,
-  viewedWeek: number
-) {
-  const games = await getLeagueGames(leagueType, season, viewedWeek);
-  if (games.length === 0) return;
-
-  try {
-    await syncGamesForLeagueTypeWeek(leagueType, season, viewedWeek);
-  } catch (e) {
-    console.error("Failed to sync scores for week", viewedWeek, e);
-  }
-}
-
-async function syncStaleWeeksForSeason(
-  leagueId: string,
-  leagueType: LeagueType,
-  season: number,
-  maxWeeks: number,
-  limit = 3
-) {
-  const now = new Date();
-  let synced = 0;
-
-  for (let week = maxWeeks; week >= 1 && synced < limit; week--) {
-    const games = await getLeagueGames(leagueType, season, week);
-    const gameIds = games.map((g) => g.id);
-    if (gameIds.length === 0) continue;
-
-    const picks = await prisma.pick.findMany({
-      where: { leagueId, gameId: { in: gameIds } },
-      include: { game: true },
-    });
-    if (picks.length === 0 || isWeekCompleteForPickedGames(picks)) continue;
-
-    const pickedGames = getUniquePickedGames(picks).filter(
-      (g) => !isGameCancelledOrPostponed(g.status)
-    );
-    if (pickedGames.length === 0) continue;
-
-    const lastKickoff = pickedGames.reduce(
-      (latest, game) => (game.kickoff > latest ? game.kickoff : latest),
-      pickedGames[0].kickoff
-    );
-    if (lastKickoff >= now) continue;
-
-    try {
-      await syncGamesForLeagueTypeWeek(leagueType, season, week);
-      synced++;
-    } catch (e) {
-      console.error("Failed to sync scores for week", week, e);
-    }
-  }
-}
-
-export async function getWeeklyLeaderboard(leagueId: string, week: number, season: number) {
-  const league = await prisma.league.findUnique({
-    where: { id: leagueId },
-    include: {
-      members: { include: { user: { select: { id: true, username: true, name: true } } } },
-    },
-  });
-  if (!league) return [];
-
-  const games = await getLeagueGames(league.leagueType, season, week);
-  const gameIds = games.map((g) => g.id);
-
-  const picks = await prisma.pick.findMany({
-    where: { leagueId, gameId: { in: gameIds } },
-    include: { game: true },
-  });
-
-  const members = league.members.map((m) => ({
-    userId: m.user.id,
-    username: m.user.username,
-    name: m.user.name,
-  }));
-
-  return computeWeeklyScores(members, picks);
-}
-
 export async function getWeeklyLeaderboardData(leagueId: string, week: number, season: number) {
+  const stored = await getStoredWeeklyLeaderboard(leagueId, week, season);
+  if (stored) return stored;
+
   const league = await prisma.league.findUnique({
     where: { id: leagueId },
     include: {
@@ -219,43 +141,7 @@ export async function getWeeklyLeaderboardData(leagueId: string, week: number, s
 }
 
 export async function getSeasonLeaderboard(leagueId: string, season: number) {
-  const league = await prisma.league.findUnique({
-    where: { id: leagueId },
-    include: {
-      members: { include: { user: { select: { id: true, username: true, name: true } } } },
-    },
-  });
-  if (!league) return [];
-
-  const members = league.members.map((m) => ({
-    userId: m.user.id,
-    username: m.user.username,
-    name: m.user.name,
-  }));
-
-  const maxWeeks = maxWeeksForLeague(league.leagueType);
-  await syncStaleWeeksForSeason(leagueId, league.leagueType, season, maxWeeks);
-
-  const weeklyScoresByWeek = new Map<number, ReturnType<typeof computeWeeklyScores>>();
-
-  for (let week = 1; week <= maxWeeks; week++) {
-    const games = await getLeagueGames(league.leagueType, season, week);
-    const gameIds = games.map((g) => g.id);
-    if (gameIds.length === 0) continue;
-
-    const picks = await prisma.pick.findMany({
-      where: { leagueId, gameId: { in: gameIds } },
-      include: { game: true },
-    });
-    if (!isWeekCompleteForPickedGames(picks)) continue;
-
-    const scores = computeWeeklyScores(members, picks);
-    if (scores.length > 0) {
-      weeklyScoresByWeek.set(week, scores);
-    }
-  }
-
-  return computeSeasonStandings(members, weeklyScoresByWeek);
+  return getStoredSeasonLeaderboard(leagueId, season);
 }
 
 export async function getAllPicksForLeague(leagueId: string, week: number, season: number) {
