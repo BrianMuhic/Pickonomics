@@ -24,9 +24,9 @@ export default async function StatsPage() {
   const stats = await getUserStats(user.id);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="card">
-        <h1 className="mb-2 text-2xl font-bold">My Stats</h1>
+        <h1 className="page-title mb-2">My Stats</h1>
         <p className="muted text-sm">
           @{stats.username} · {stats.name}
         </p>
@@ -34,14 +34,16 @@ export default async function StatsPage() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="card">
-          <h2 className="muted mb-1 text-sm font-medium">Correct Pick Rate</h2>
-          <p className="text-3xl font-bold">{formatPercentage(stats.overall.correctPickPercentage)}</p>
-          <p className="muted mt-2 text-sm">Across all leagues with finalized games</p>
+          <h2 className="muted mb-2 text-xs font-bold uppercase tracking-wider">
+            Correct Pick Rate
+          </h2>
+          <p className="stat-value">{formatPercentage(stats.overall.correctPickPercentage)}</p>
+          <p className="muted mt-3 text-sm">Across all leagues with finalized games</p>
         </div>
         <div className="card">
-          <h2 className="muted mb-1 text-sm font-medium">Average Place</h2>
-          <p className="text-3xl font-bold">{formatPlace(stats.overall.averagePlace)}</p>
-          <p className="muted mt-2 text-sm">
+          <h2 className="muted mb-2 text-xs font-bold uppercase tracking-wider">Average Place</h2>
+          <p className="stat-value">{formatPlace(stats.overall.averagePlace)}</p>
+          <p className="muted mt-3 text-sm">
             Season rank averaged across {stats.overall.leagueCount}{" "}
             {stats.overall.leagueCount === 1 ? "league" : "leagues"}
           </p>
@@ -49,7 +51,7 @@ export default async function StatsPage() {
       </div>
 
       <div className="card">
-        <h2 className="mb-4 text-xl font-semibold">By League Type</h2>
+        <h2 className="section-title mb-4">By League Type</h2>
         {stats.overall.leagueCount === 0 ? (
           <p className="muted">
             You haven&apos;t joined any leagues yet.{" "}

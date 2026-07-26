@@ -21,24 +21,24 @@ export default async function SettingsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-lg space-y-4">
+    <div className="mx-auto max-w-lg space-y-5">
       <div className="card">
-        <h1 className="mb-4 text-2xl font-bold">Account Settings</h1>
+        <h1 className="page-title mb-5">Account Settings</h1>
         <dl className="space-y-4">
           <div>
-            <dt className="muted text-sm font-medium">Name</dt>
-            <dd className="mt-1 text-lg">{profile.name}</dd>
+            <dt className="muted text-xs font-bold uppercase tracking-wider">Name</dt>
+            <dd className="mt-1 text-lg font-semibold text-[var(--navy)]">{profile.name}</dd>
           </div>
           <div>
-            <dt className="muted text-sm font-medium">Username</dt>
-            <dd className="mt-1 text-lg">@{profile.username}</dd>
+            <dt className="muted text-xs font-bold uppercase tracking-wider">Username</dt>
+            <dd className="mt-1 text-lg font-semibold text-[var(--navy)]">@{profile.username}</dd>
           </div>
           <div>
-            <dt className="muted text-sm font-medium">Email</dt>
+            <dt className="muted text-xs font-bold uppercase tracking-wider">Email</dt>
             <dd className="mt-1 text-lg">{profile.email}</dd>
           </div>
           <div>
-            <dt className="muted text-sm font-medium">Member since</dt>
+            <dt className="muted text-xs font-bold uppercase tracking-wider">Member since</dt>
             <dd className="mt-1">{new Date(profile.createdAt).toLocaleDateString()}</dd>
           </div>
         </dl>

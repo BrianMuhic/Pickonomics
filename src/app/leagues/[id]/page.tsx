@@ -30,11 +30,11 @@ export default async function LeaguePicksPage({
   if (!isMember) {
     return (
       <div className="card">
-        <h1 className="text-2xl font-bold">{league.name}</h1>
+        <h1 className="page-title">{league.name}</h1>
         <p className="muted mt-2">
           {LEAGUE_TYPE_LABELS[league.leagueType]} · Commissioner: @{league.commissioner.username}
         </p>
-        <Link href={`/leagues/${id}/join`} className="btn btn-primary mt-4">
+        <Link href={`/leagues/${id}/join`} className="btn btn-primary mt-5">
           Join this league
         </Link>
       </div>
@@ -48,16 +48,19 @@ export default async function LeaguePicksPage({
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="card">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">{league.name}</h1>
-            <p className="muted text-sm">
-              {LEAGUE_TYPE_LABELS[league.leagueType]} · Season {league.season} ·{" "}
-              {league.members.length} members
-              {isCommissioner ? " · You are the commissioner" : ""}
-            </p>
+            <h1 className="page-title">{league.name}</h1>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <span className="pill">{LEAGUE_TYPE_LABELS[league.leagueType]}</span>
+              <span className="pill pill-muted">Season {league.season}</span>
+              <span className="pill pill-muted">
+                {league.members.length} member{league.members.length !== 1 ? "s" : ""}
+              </span>
+              {isCommissioner && <span className="pill">Commissioner</span>}
+            </div>
           </div>
           <LeagueToolbar
             leagueId={id}
@@ -71,8 +74,8 @@ export default async function LeaguePicksPage({
       </div>
 
       <div className="card">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
-          <h2 className="text-xl font-semibold">Week {week} Picks</h2>
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
+          <h2 className="section-title">Week {week} Picks</h2>
           {isCommissioner && (
             <PicksLockButton
               leagueId={id}

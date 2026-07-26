@@ -18,8 +18,8 @@ export function WeekSelector({
   const path = basePath ? `/leagues/${leagueId}/${basePath}` : `/leagues/${leagueId}`;
 
   return (
-    <div className="flex flex-wrap items-center gap-1">
-      <span className="muted mr-2 text-sm">Week:</span>
+    <div className="week-selector">
+      <span className="week-selector-label">Week</span>
       {weeks.map((week) => (
         <Link
           key={week}

@@ -33,7 +33,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
 
   return (
     <div className="card mx-auto max-w-md">
-      <h1 className="mb-4 text-2xl font-bold">Set new password</h1>
+      <h1 className="page-title mb-5">Set new password</h1>
       {state.error && <Alert type="error" message={state.error} />}
       <form action={formAction} className="space-y-4">
         <input type="hidden" name="token" value={token} />

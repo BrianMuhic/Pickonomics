@@ -36,10 +36,13 @@ export default async function GamesPage({
   if (!isMember) redirect(`/leagues/${id}/join`);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="card">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
-          <h1 className="text-2xl font-bold">Games — Week {week}</h1>
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="page-title">Games</h1>
+            <p className="muted mt-1 text-sm">Week {week} schedule</p>
+          </div>
           <LeagueToolbar
             leagueId={id}
             week={week}
@@ -68,15 +71,21 @@ export default async function GamesPage({
               {games.map((g) => (
                 <tr key={g.id}>
                   <td className="text-sm">{formatGameDateTime(g.kickoff)}</td>
-                  <td>
-                    {g.awayTeam.abbreviation} @ {g.homeTeam.abbreviation}
+                  <td className="font-display font-semibold tracking-wide text-[var(--navy)]">
+                    {g.awayTeam.abbreviation}
+                    <span className="muted mx-2 text-xs font-bold">VS</span>
+                    {g.homeTeam.abbreviation}
                   </td>
-                  <td>
+                  <td className="font-semibold tabular-nums">
                     {g.awayScore != null && g.homeScore != null
-                      ? `${g.awayScore} - ${g.homeScore}`
+                      ? `${g.awayScore}–${g.homeScore}`
                       : "—"}
                   </td>
-                  <td>{STATUS_LABELS[g.status] ?? g.status}</td>
+                  <td>
+                    <span className={g.status === "status_final" ? "pill" : "pill pill-muted"}>
+                      {STATUS_LABELS[g.status] ?? g.status}
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>

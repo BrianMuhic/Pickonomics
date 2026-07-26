@@ -26,7 +26,7 @@ export function DeleteAccountSection({
   }
 
   return (
-    <div className="card border-[#7f1d1d]">
+    <div className="card card-danger">
       <h2 className="mb-2 text-xl font-semibold text-[var(--red)]">Delete Account</h2>
       <p className="muted mb-4 text-sm">
         Permanently remove your account and all associated data. Enter your password to confirm.

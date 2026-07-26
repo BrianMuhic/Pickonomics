@@ -29,7 +29,7 @@ export function WeeklyLeaderboard({
             key={row.username}
             className={weekComplete && winners.has(row.username) ? "leaderboard-row-winner" : undefined}
           >
-            <td>{i + 1}</td>
+            <td className="rank-cell">{i + 1}</td>
             <td>
               <strong>@{row.username}</strong>
               <span className="muted ml-2 text-sm">{row.name}</span>
@@ -65,7 +65,7 @@ export function SeasonLeaderboard({
       <tbody>
         {rows.map((row, i) => (
           <tr key={row.username}>
-            <td>{i + 1}</td>
+            <td className="rank-cell">{i + 1}</td>
             <td>
               <strong>@{row.username}</strong>
               <span className="muted ml-2 text-sm">{row.name}</span>

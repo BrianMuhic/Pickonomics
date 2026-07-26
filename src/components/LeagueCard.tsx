@@ -18,17 +18,18 @@ export function LeagueCard({
   isMember: boolean;
 }) {
   return (
-    <div className="card flex flex-col gap-3">
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <h3 className="text-lg font-semibold">{name}</h3>
-          <p className="muted text-sm">
-            {LEAGUE_TYPE_LABELS[leagueType]} · {memberCount} member{memberCount !== 1 ? "s" : ""} ·{" "}
-            {isPublic ? "Public" : "Private"}
-          </p>
+    <div className="league-card">
+      <div>
+        <h3 className="text-lg font-semibold text-[var(--navy)]">{name}</h3>
+        <div className="league-card-meta">
+          <span className="pill">{LEAGUE_TYPE_LABELS[leagueType]}</span>
+          <span className="pill pill-muted">
+            {memberCount} member{memberCount !== 1 ? "s" : ""}
+          </span>
+          <span className="pill pill-muted">{isPublic ? "Public" : "Private"}</span>
         </div>
       </div>
-      <div>
+      <div className="league-card-actions">
         {isMember ? (
           <Link href={`/leagues/${id}`} className="btn btn-primary">
             Open League

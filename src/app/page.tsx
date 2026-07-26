@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { LeagueCard } from "@/components/LeagueCard";
 import { getCurrentUser } from "@/lib/auth";
@@ -78,38 +79,41 @@ export default async function HomePage({
     : [];
 
   return (
-    <div className="space-y-8">
-      <div className="card">
-        <h1 className="mb-2 text-3xl font-bold">Pickonomics</h1>
-        <p className="muted">
-          Pick winners in NFL, MLB, ACC, SEC, and Big Ten leagues. Compete weekly and climb the season
+    <div className="space-y-10">
+      <section className="card card-hero">
+        <div className="hero-brand-row">
+          <Image src="/logo.png" alt="" width={64} height={64} priority />
+          <h1 className="hero-brand">
+            Pick<span className="brand-o">o</span>nomics
+          </h1>
+        </div>
+        <p className="hero-tagline">
+          Pick weekly winners across NFL, MLB, ACC, SEC, and Big Ten — then climb the season
           leaderboard.
         </p>
         {user ? (
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Link href="/leagues/new" className="btn btn-primary">
+          <div className="hero-actions">
+            <Link href="/leagues/new" className="btn btn-primary-on-dark">
               Create League
             </Link>
-            <Link href="/my-leagues" className="btn">
+            <Link href="/my-leagues" className="btn btn-on-dark">
               My Leagues
             </Link>
           </div>
         ) : (
-          <p className="mt-4">
-            <Link href="/register" className="text-link">
-              Sign up
-            </Link>{" "}
-            or{" "}
-            <Link href="/login" className="text-link">
-              log in
-            </Link>{" "}
-            to get started.
-          </p>
+          <div className="hero-actions">
+            <Link href="/register" className="btn btn-primary-on-dark">
+              Get started
+            </Link>
+            <Link href="/login" className="btn btn-on-dark">
+              Log in
+            </Link>
+          </div>
         )}
-      </div>
+      </section>
 
       <section>
-        <h2 className="mb-2 text-xl font-semibold">Find Private Leagues</h2>
+        <h2 className="section-title">Find Private Leagues</h2>
         <p className="muted mb-4 text-sm">
           Search by league name. You will need the league password to join.
         </p>
@@ -154,7 +158,7 @@ export default async function HomePage({
 
       {user && myLeagues.length > 0 && (
         <section>
-          <h2 className="mb-4 text-xl font-semibold">My Leagues</h2>
+          <h2 className="section-title mb-4">My Leagues</h2>
           <div className="grid-cards">
             {myLeagues.map((league) => (
               <LeagueCard
@@ -172,7 +176,7 @@ export default async function HomePage({
       )}
 
       <section>
-        <h2 className="mb-4 text-xl font-semibold">Public Leagues</h2>
+        <h2 className="section-title mb-4">Public Leagues</h2>
         {publicLeagues.length === 0 ? (
           <p className="muted">No public leagues yet. Be the first to create one!</p>
         ) : (

@@ -20,7 +20,7 @@ export function LeagueNav({
         <Link
           key={link.key}
           href={link.href}
-          className={`btn ${active === link.key ? "btn-primary" : ""}`}
+          className={`league-nav-link ${active === link.key ? "league-nav-link-active" : ""}`}
         >
           {link.label}
         </Link>
