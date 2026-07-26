@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Manrope, Oswald } from "next/font/google";
+import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { Nav } from "@/components/Nav";
+import { themeInitScript } from "@/components/theme-init";
 import { getCurrentUser } from "@/lib/auth";
 import "./globals.css";
 
-const inter = Inter({
+const manrope = Manrope({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-body",
+});
+
+const oswald = Oswald({
+  subsets: ["latin"],
+  variable: "--font-display",
 });
 
 export const metadata: Metadata = {
@@ -23,11 +30,16 @@ export default async function RootLayout({
   const user = await getCurrentUser();
 
   return (
-    <html lang="en">
-      <body className={`${inter.variable} antialiased`}>
-        <div className="wrap">
-          <Nav user={user} />
-          {children}
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${manrope.variable} ${oswald.variable} antialiased`}>
+        <Script id="theme-init" strategy="beforeInteractive">
+          {themeInitScript}
+        </Script>
+        <div className="site-shell">
+          <div className="wrap">
+            <Nav user={user} />
+            {children}
+          </div>
         </div>
         <Analytics />
       </body>

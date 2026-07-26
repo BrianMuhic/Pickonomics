@@ -30,10 +30,13 @@ export default async function AllPicksPage({
   const { games, members, pickMap } = await getAllPicksForLeague(id, week, league.season);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="card">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
-          <h1 className="text-2xl font-bold">All Picks — Week {week}</h1>
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="page-title">All Picks</h1>
+            <p className="muted mt-1 text-sm">Week {week} grid</p>
+          </div>
           <LeagueToolbar
             leagueId={id}
             week={week}
@@ -75,16 +78,23 @@ export default async function AllPicksPage({
                     </td>
                     {games.map((g) => {
                       const pick = userPicks?.get(g.id);
-                      const correct = g.winner && pick === g.winner;
-                      const wrong = g.winner && pick && pick !== g.winner;
+                      const correct = Boolean(g.winner && pick === g.winner);
+                      const wrong = Boolean(g.winner && pick && pick !== g.winner);
                       const display = pick
                         ? pick === "away"
                           ? g.awayTeam.abbreviation
                           : g.homeTeam.abbreviation
                         : "—";
+                      const resultClass = correct
+                        ? "pick-result-correct"
+                        : wrong
+                          ? "pick-result-wrong"
+                          : g.winner
+                            ? "pick-result-pending"
+                            : "";
                       return (
                         <td key={g.id} className="text-center text-sm">
-                          {g.winner ? (correct ? "✅" : wrong ? "❌" : "⏳") : ""} {display}
+                          <span className={`pick-result ${resultClass}`}>{display}</span>
                         </td>
                       );
                     })}

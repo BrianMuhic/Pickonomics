@@ -8,7 +8,8 @@ export default async function NewLeaguePage() {
 
   return (
     <div className="card mx-auto max-w-lg">
-      <h1 className="mb-4 text-2xl font-bold">Create a League</h1>
+      <h1 className="page-title mb-2">Create a League</h1>
+      <p className="muted mb-5 text-sm">Set up a private or public pick&apos;em pool.</p>
       <CreateLeagueForm />
     </div>
   );

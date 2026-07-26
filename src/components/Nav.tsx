@@ -1,50 +1,56 @@
+import Image from "next/image";
 import Link from "next/link";
 import { logoutAction } from "@/actions/auth";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import type { SessionUser } from "@/lib/session";
 
 export function Nav({ user }: { user: SessionUser | null }) {
   return (
-    <nav className="mb-6 flex flex-wrap items-center justify-between gap-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <Link href="/" className="nav-brand text-2xl font-black">
-          Pickonomics
+    <nav className="site-nav">
+      <div className="flex flex-wrap items-center gap-2">
+        <Link href="/" className="nav-brand">
+          <Image src="/logo.png" alt="" width={40} height={40} priority />
+          <span className="brand-text">
+            Pick<span className="brand-o">o</span>nomics
+          </span>
         </Link>
         {user && (
-          <>
-            <Link href="/leagues/new" className="btn">
-              Create League
-            </Link>
-            <Link href="/my-leagues" className="btn">
+          <div className="nav-links ml-2">
+            <Link href="/my-leagues" className="nav-link">
               My Leagues
             </Link>
+            <Link href="/leagues/new" className="nav-link">
+              Create
+            </Link>
             {user.isAdmin && (
-              <Link href="/admin" className="btn btn-admin">
+              <Link href="/admin" className="nav-link">
                 Admin
               </Link>
             )}
-          </>
+          </div>
         )}
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <ThemeToggle />
         {user ? (
           <>
-            <span className="pill">@{user.username}</span>
-            <Link href="/stats" className="btn">
+            <span className="nav-user">@{user.username}</span>
+            <Link href="/stats" className="nav-link">
               Stats
             </Link>
-            <Link href="/settings" className="btn">
+            <Link href="/settings" className="nav-link">
               Settings
             </Link>
             <form action={logoutAction}>
-              <button type="submit" className="btn btn-danger">
-                Logout
+              <button type="submit" className="btn btn-ghost">
+                Log out
               </button>
             </form>
           </>
         ) : (
           <>
-            <Link href="/login" className="btn">
-              Login
+            <Link href="/login" className="nav-link">
+              Log in
             </Link>
             <Link href="/register" className="btn btn-primary">
               Sign up

@@ -3,7 +3,6 @@
 import { useActionState } from "react";
 import { submitPicksAction } from "@/actions/picks";
 import { Alert } from "./Alert";
-import type { ActionResult } from "@/actions/auth";
 import { formatGameDateTime } from "@/lib/datetime";
 
 type GameRow = {
@@ -60,16 +59,16 @@ export function PicksForm({
         <div className="space-y-3">
           {games.map((game) => (
             <div key={game.id} className="game-row">
-              <div className="text-sm muted mb-2">
-                {formatGameDateTime(game.kickoff)}
+              <div className="muted mb-3 flex flex-wrap items-center justify-between gap-2 text-sm">
+                <span>{formatGameDateTime(game.kickoff)}</span>
                 {game.winner && (
-                  <span className="ml-2">
-                    Final: {game.awayScore} - {game.homeScore}
+                  <span className="font-semibold text-[var(--navy)]">
+                    Final {game.awayScore}–{game.homeScore}
                   </span>
                 )}
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <label className={`pick-option ${game.userPick === "away" ? "pick-selected" : ""}`}>
+              <div className="pick-grid">
+                <label className="pick-option">
                   <input
                     type="radio"
                     name={`game_${game.id}`}
@@ -80,7 +79,10 @@ export function PicksForm({
                   />
                   <span>{game.away}</span>
                 </label>
-                <label className={`pick-option ${game.userPick === "home" ? "pick-selected" : ""}`}>
+                <div className="pick-vs" aria-hidden="true">
+                  VS
+                </div>
+                <label className="pick-option">
                   <input
                     type="radio"
                     name={`game_${game.id}`}
@@ -96,7 +98,7 @@ export function PicksForm({
           ))}
         </div>
         {canPick && (
-          <button type="submit" className="btn btn-primary mt-4" disabled={pending}>
+          <button type="submit" className="btn btn-primary mt-5 w-full sm:w-auto" disabled={pending}>
             {pending ? "Saving..." : "Save Picks"}
           </button>
         )}

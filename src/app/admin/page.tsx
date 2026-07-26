@@ -12,27 +12,24 @@ export default async function AdminPage() {
     prisma.game.count(),
   ]);
 
+  const stats = [
+    { label: "Users", value: userCount },
+    { label: "Leagues", value: leagueCount },
+    { label: "Picks", value: pickCount },
+    { label: "Games", value: gameCount },
+  ];
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="card">
-        <h1 className="mb-4 text-2xl font-bold">Admin Dashboard</h1>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          <div className="rounded-lg bg-[#0b1220] p-4">
-            <p className="muted text-sm">Users</p>
-            <p className="text-2xl font-bold">{userCount}</p>
-          </div>
-          <div className="rounded-lg bg-[#0b1220] p-4">
-            <p className="muted text-sm">Leagues</p>
-            <p className="text-2xl font-bold">{leagueCount}</p>
-          </div>
-          <div className="rounded-lg bg-[#0b1220] p-4">
-            <p className="muted text-sm">Picks</p>
-            <p className="text-2xl font-bold">{pickCount}</p>
-          </div>
-          <div className="rounded-lg bg-[#0b1220] p-4">
-            <p className="muted text-sm">Games</p>
-            <p className="text-2xl font-bold">{gameCount}</p>
-          </div>
+        <h1 className="page-title mb-5">Admin Dashboard</h1>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {stats.map((stat) => (
+            <div key={stat.label} className="stat-tile">
+              <p className="muted text-xs font-bold uppercase tracking-wider">{stat.label}</p>
+              <p className="stat-value mt-2 text-2xl">{stat.value}</p>
+            </div>
+          ))}
         </div>
         <div className="mt-6 flex flex-wrap gap-2">
           <Link href="/admin/leagues" className="btn">

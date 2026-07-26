@@ -34,8 +34,8 @@ export default async function AdminPicksPage({
 
   return (
     <div className="card">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold">All Picks</h1>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
+        <h1 className="page-title">All Picks</h1>
         <Link href="/admin" className="btn">
           Back
         </Link>

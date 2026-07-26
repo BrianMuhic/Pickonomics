@@ -15,11 +15,11 @@ export default async function MyLeaguesPage() {
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="card">
-        <h1 className="mb-2 text-2xl font-bold">My Leagues</h1>
+        <h1 className="page-title mb-2">My Leagues</h1>
         <p className="muted text-sm">Leagues you&apos;ve joined or created.</p>
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-5 flex flex-wrap gap-2">
           <Link href="/leagues/new" className="btn btn-primary">
             Create League
           </Link>

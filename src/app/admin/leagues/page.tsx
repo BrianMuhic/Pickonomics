@@ -16,8 +16,8 @@ export default async function AdminLeaguesPage() {
 
   return (
     <div className="card">
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">All Leagues</h1>
+      <div className="mb-5 flex items-center justify-between">
+        <h1 className="page-title">All Leagues</h1>
         <Link href="/admin" className="btn">
           Back
         </Link>

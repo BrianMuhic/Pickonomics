@@ -42,12 +42,15 @@ export default async function LeaderboardPage({
   const seasonRows = await getSeasonLeaderboard(id, league.season);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="card">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">{league.name} — Leaderboard</h1>
-            <p className="muted text-sm">{LEAGUE_TYPE_LABELS[league.leagueType]}</p>
+            <h1 className="page-title">{league.name}</h1>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <span className="pill">Leaderboard</span>
+              <span className="pill pill-muted">{LEAGUE_TYPE_LABELS[league.leagueType]}</span>
+            </div>
           </div>
           <LeagueToolbar
             leagueId={id}
@@ -66,8 +69,8 @@ export default async function LeaderboardPage({
       </div>
 
       <div className="card">
-        <h2 className="mb-4 text-xl font-semibold">Week {week} Standings</h2>
-        <p className="muted mb-4 text-sm">1 point per correct pick. Ties for 1st all receive a weekly win.</p>
+        <h2 className="section-title mb-2">Week {week} Standings</h2>
+        <p className="muted mb-5 text-sm">1 point per correct pick. Ties for 1st all receive a weekly win.</p>
         <WeeklyLeaderboard
           rows={weeklyRows}
           weekComplete={weekComplete}
@@ -76,8 +79,8 @@ export default async function LeaderboardPage({
       </div>
 
       <div className="card">
-        <h2 className="mb-4 text-xl font-semibold">Season Standings</h2>
-        <p className="muted mb-4 text-sm">
+        <h2 className="section-title mb-2">Season Standings</h2>
+        <p className="muted mb-5 text-sm">
           Ranked by weekly wins. Tiebreaker: total correct picks across completed weeks.
         </p>
         <SeasonLeaderboard rows={seasonRows} />

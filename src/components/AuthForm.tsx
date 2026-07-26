@@ -22,7 +22,7 @@ export function AuthForm({
 
   return (
     <div className="card mx-auto max-w-md">
-      <h1 className="mb-4 text-2xl font-bold">{title}</h1>
+      <h1 className="page-title mb-5">{title}</h1>
       {state.error && <Alert type="error" message={state.error} />}
       {state.success && <Alert type="success" message={state.success} />}
       <form action={formAction} className="space-y-4">
@@ -38,7 +38,7 @@ export function AuthForm({
 
 export function AuthFooter({ text, linkText, href }: { text: string; linkText: string; href: string }) {
   return (
-    <p className="muted mt-4 text-center text-sm">
+    <p className="muted mt-5 text-center text-sm">
       {text}{" "}
       <Link href={href} className="text-link">
         {linkText}
