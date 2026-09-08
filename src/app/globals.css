@@ -882,6 +882,47 @@ textarea.field-input:focus {
 
 /* ——— League chrome ——— */
 
+.league-settings-dialog {
+  width: min(22rem, calc(100vw - 2rem));
+  max-height: min(85dvh, 40rem);
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 16px 48px rgba(10, 31, 61, 0.22);
+  z-index: 80;
+}
+
+.league-settings-dialog:focus {
+  outline: none;
+}
+
+.league-settings-dialog:focus-visible {
+  outline: 2px solid var(--blue-bright);
+  outline-offset: 2px;
+}
+
+.league-settings-dialog::backdrop {
+  background: rgba(10, 31, 61, 0.48);
+}
+
+[data-theme="dark"] .league-settings-dialog {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="dark"] .league-settings-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.62);
+}
+
+.league-settings-dialog-inner {
+  max-height: min(85dvh, 40rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px;
+}
+
 .league-nav {
   display: flex;
   flex-wrap: wrap;
