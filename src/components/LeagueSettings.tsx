@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState, useTransition } from "react";
+import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   deleteLeagueAction,
@@ -122,16 +122,40 @@ export function LeagueSettings({
   leagueId: string;
   isPublic: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  function openSettings() {
+    dialogRef.current?.showModal();
+  }
+
+  function closeSettings() {
+    dialogRef.current?.close();
+  }
 
   return (
-    <div className="relative">
-      <button type="button" className="btn" onClick={() => setOpen((v) => !v)}>
-        {open ? "Close" : "League Settings"}
+    <div>
+      <button type="button" className="btn" onClick={openSettings}>
+        League Settings
       </button>
-      {open && (
-        <div className="absolute right-0 z-10 mt-2 w-80 rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 shadow-lg">
-          <h3 className="mb-4 font-semibold">League Settings</h3>
+      <dialog
+        ref={dialogRef}
+        className="league-settings-dialog"
+        aria-labelledby="league-settings-title"
+        onClick={(event) => {
+          if (event.target === event.currentTarget) {
+            closeSettings();
+          }
+        }}
+      >
+        <div className="league-settings-dialog-inner">
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <h3 id="league-settings-title" className="font-semibold">
+              League Settings
+            </h3>
+            <button type="button" className="btn btn-ghost" onClick={closeSettings}>
+              Close
+            </button>
+          </div>
           <div className="space-y-4">
             <LeagueVisibilityForm leagueId={leagueId} isPublic={isPublic} />
             {!isPublic && (
@@ -142,7 +166,7 @@ export function LeagueSettings({
             <DeleteLeagueSection leagueId={leagueId} />
           </div>
         </div>
-      )}
+      </dialog>
     </div>
   );
 }
