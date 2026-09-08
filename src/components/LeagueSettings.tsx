@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import {
   deleteLeagueAction,
@@ -123,6 +124,11 @@ export function LeagueSettings({
   isPublic: boolean;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   function openSettings() {
     dialogRef.current?.showModal();
@@ -132,41 +138,45 @@ export function LeagueSettings({
     dialogRef.current?.close();
   }
 
+  const dialog = (
+    <dialog
+      ref={dialogRef}
+      className="league-settings-dialog"
+      aria-labelledby="league-settings-title"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) {
+          closeSettings();
+        }
+      }}
+    >
+      <div className="league-settings-dialog-inner">
+        <div className="mb-4 flex items-start justify-between gap-3">
+          <h3 id="league-settings-title" className="font-semibold">
+            League Settings
+          </h3>
+          <button type="button" className="btn btn-ghost" onClick={closeSettings}>
+            Close
+          </button>
+        </div>
+        <div className="space-y-4">
+          <LeagueVisibilityForm leagueId={leagueId} isPublic={isPublic} />
+          {!isPublic && (
+            <div className="border-t border-[var(--border)] pt-4">
+              <ChangeLeaguePasswordForm leagueId={leagueId} embedded />
+            </div>
+          )}
+          <DeleteLeagueSection leagueId={leagueId} />
+        </div>
+      </div>
+    </dialog>
+  );
+
   return (
     <div>
       <button type="button" className="btn" onClick={openSettings}>
         League Settings
       </button>
-      <dialog
-        ref={dialogRef}
-        className="league-settings-dialog"
-        aria-labelledby="league-settings-title"
-        onClick={(event) => {
-          if (event.target === event.currentTarget) {
-            closeSettings();
-          }
-        }}
-      >
-        <div className="league-settings-dialog-inner">
-          <div className="mb-4 flex items-start justify-between gap-3">
-            <h3 id="league-settings-title" className="font-semibold">
-              League Settings
-            </h3>
-            <button type="button" className="btn btn-ghost" onClick={closeSettings}>
-              Close
-            </button>
-          </div>
-          <div className="space-y-4">
-            <LeagueVisibilityForm leagueId={leagueId} isPublic={isPublic} />
-            {!isPublic && (
-              <div className="border-t border-[var(--border)] pt-4">
-                <ChangeLeaguePasswordForm leagueId={leagueId} embedded />
-              </div>
-            )}
-            <DeleteLeagueSection leagueId={leagueId} />
-          </div>
-        </div>
-      </dialog>
+      {mounted ? createPortal(dialog, document.body) : null}
     </div>
   );
 }

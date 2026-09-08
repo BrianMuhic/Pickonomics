@@ -892,6 +892,7 @@ textarea.field-input:focus {
   background: var(--card);
   color: var(--ink);
   box-shadow: 0 16px 48px rgba(10, 31, 61, 0.22);
+  z-index: 80;
 }
 
 .league-settings-dialog:focus {
