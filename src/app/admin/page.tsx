@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { SendRemindersButton } from "@/components/SendRemindersButton";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { REMINDER_HOUR, reminderTimezone } from "@/lib/reminders";
 
 export default async function AdminPage() {
   await requireAdmin();
@@ -42,6 +44,16 @@ export default async function AdminPage() {
             All Picks
           </Link>
         </div>
+      </div>
+
+      <div className="card">
+        <h2 className="section-title mb-2">Pick Reminders</h2>
+        <p className="muted mb-4 text-sm">
+          NFL leagues are emailed automatically at {REMINDER_HOUR}:00 ({reminderTimezone()}) when
+          the week&apos;s deadline is near. Send now to remind everyone with outstanding picks —
+          members already reminded today are skipped.
+        </p>
+        <SendRemindersButton />
       </div>
     </div>
   );

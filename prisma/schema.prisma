@@ -51,6 +51,7 @@ model User {
   picks           Pick[]
   commissioned    League[]       @relation("Commissioner")
   weeklyResults   WeeklyResult[]
+  pickReminders   PickReminder[]
 }
 
 model League {
@@ -68,6 +69,7 @@ model League {
   picks          Pick[]
   deadlines      PickDeadline[]
   weeklyResults  WeeklyResult[]
+  pickReminders  PickReminder[]
 
   @@index([isPublic])
   @@index([leagueType])
@@ -149,6 +151,23 @@ model PickDeadline {
   league League @relation(fields: [leagueId], references: [id], onDelete: Cascade)
 
   @@unique([leagueId, week, season])
+}
+
+model PickReminder {
+  id       String   @id @default(cuid())
+  leagueId String
+  userId   String
+  week     Int
+  season   Int
+  /// Calendar day in the reminder timezone (YYYY-MM-DD), so a retry never double-sends.
+  sentOn   String
+  sentAt   DateTime @default(now())
+
+  league League @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([leagueId, userId, week, season, sentOn])
+  @@index([leagueId, season])
 }
 
 model WeeklyResult {

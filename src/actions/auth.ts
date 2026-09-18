@@ -9,6 +9,7 @@ import {
   isAdminEmail,
   verifyPassword,
 } from "@/lib/auth";
+import { appUrl, sendEmail } from "@/lib/email";
 import { getSession } from "@/lib/session";
 import { loginSchema, registerSchema } from "@/lib/validations";
 
@@ -119,26 +120,17 @@ export async function forgotPasswordAction(
       data: { resetToken, resetTokenExp },
     });
 
-    const appUrl = process.env.APP_URL || "http://localhost:3000";
-    const resetUrl = `${appUrl}/reset-password?token=${resetToken}`;
+    const resetUrl = `${appUrl()}/reset-password?token=${resetToken}`;
 
-    if (process.env.RESEND_API_KEY) {
-      await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: process.env.EMAIL_FROM || "Pickonomics <onboarding@resend.dev>",
-          to: email,
-          subject: "Reset your Pickonomics password",
-          html: `<p>Click <a href="${resetUrl}">here</a> to reset your password. This link expires in 1 hour.</p>`,
-        }),
-      });
-    } else {
+    if (!process.env.RESEND_API_KEY) {
       console.log(`[dev] Password reset link for ${email}: ${resetUrl}`);
     }
+
+    await sendEmail({
+      to: email,
+      subject: "Reset your Pickonomics password",
+      html: `<p>Click <a href="${resetUrl}">here</a> to reset your password. This link expires in 1 hour.</p>`,
+    });
   }
 
   return {
