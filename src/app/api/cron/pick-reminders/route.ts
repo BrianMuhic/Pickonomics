@@ -23,6 +23,13 @@ function isAuthorized(request: NextRequest) {
 }
 
 /**
+ * TEMPORARY: one-off schedule (16:15 UTC = 12:15pm EDT) to verify the cron
+ * pipeline live. Runs matching it skip the 10am hour gate. Remove this
+ * schedule here and in vercel.json once the live test has passed.
+ */
+const TEST_CRON_SCHEDULE = "15 16 * * *";
+
+/**
  * Daily pick reminder job. Vercel cron runs in UTC only, so this path is
  * scheduled at both UTC hours that can be REMINDER_HOUR locally and the run
  * outside that hour exits without sending. Pass `?force=1` to ignore the hour
@@ -35,8 +42,10 @@ export async function GET(request: NextRequest) {
 
   const now = new Date();
   const force = request.nextUrl.searchParams.get("force") === "1";
+  const isTestCron =
+    request.headers.get("x-vercel-cron-schedule") === TEST_CRON_SCHEDULE;
 
-  if (!force && !isReminderHour(now)) {
+  if (!force && !isTestCron && !isReminderHour(now)) {
     return Response.json({
       ran: false,
       reason: `not ${REMINDER_HOUR}:00 in ${reminderTimezone()}`,
